@@ -1,11 +1,11 @@
 'use strict'
 
-const FabrixApp = require('fabrix')
+const FabrixApp = require('@fabrix/fabrix').FabrixApp
 const assert = require('assert')
 const _ = require('lodash')
-const config = require('./app')
+const config = require('../fixtures/app')
 
-describe('Elasticsearh Spool with validate connection', () => {
+describe('Elasticsearh Spool with valid connection', () => {
   before(() => {
     global.app = new FabrixApp(config.validate)
     return global.app.start()
@@ -14,10 +14,11 @@ describe('Elasticsearh Spool with validate connection', () => {
   after(() => {
     return global.app.stop()
   })
+
   describe('spool connected', () => {
     it('should load pack', () => {
-      assert(global.app.packs.elasticsearch)
-      assert(global.app.packs.elasticsearch.client)
+      assert(global.app.spools.elasticsearch)
+      assert(global.app.spools.elasticsearch.client)
     })
   })
 
@@ -31,7 +32,7 @@ describe('Elasticsearh Spool with validate connection', () => {
       assert(_.isFunction(global.app.elasticClient.ping))
     })
 
-    it('shuold ping without problems', () => {
+    it('should ping without problems', () => {
       return new Promise((resolve) => {
         global.app.elasticClient
           .ping((err) => {

@@ -1,13 +1,14 @@
 'use strict'
 
-const FabrixApp = require('fabrix')
+const FabrixApp = require('@fabrix/fabrix').FabrixApp
 const assert = require('assert')
 const _ = require('lodash')
+const config = require('../fixtures/app')
 
 describe('Elasticsearh Spool', () => {
 
   before(() => {
-    global.app = new FabrixApp(require('./app').noValidate)
+    global.app = new FabrixApp(config.noValidate)
     return global.app.start()
   })
 
@@ -17,8 +18,8 @@ describe('Elasticsearh Spool', () => {
 
   describe('spool connected', () => {
     it('should load pack', () => {
-      assert(global.app.packs.elasticsearch)
-      assert(global.app.packs.elasticsearch.client)
+      assert(global.app.spools.elasticsearch)
+      assert(global.app.spools.elasticsearch.client)
     })
   })
 

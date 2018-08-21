@@ -5,16 +5,16 @@ const smokesignals = require('smokesignals')
 
 exports.noValidate = _.defaultsDeep({
   pkg: {
-    name: 'elasticsearch-spool-test'
+    name: 'spool-elasticsearch-test',
+    version: '1.0.0'
   },
   config: {
     log: {
       logger: new smokesignals.Logger('error')
     },
     main: {
-      packs: [
-        require('spool-core'),
-        require('../') // spool-elasticsearch
+      spools: [
+        require('../../dist').ElasticsearchSpool // spool-elasticsearch
       ]
     },
     elasticsearch: {
@@ -30,16 +30,16 @@ exports.noValidate = _.defaultsDeep({
 
 exports.validate = _.defaultsDeep({
   pkg: {
-    name: 'elasticsearch-spool-test'
+    name: 'spool-elasticsearch-test',
+    version: '1.0.0'
   },
   config: {
     log: {
       logger: new smokesignals.Logger('error')
     },
     main: {
-      packs: [
-        require('spool-core'),
-        require('../') // spool-elasticsearch
+      spools: [
+        require('../../dist').ElasticsearchSpool // spool-elasticsearch
       ]
     },
     elasticsearch: {

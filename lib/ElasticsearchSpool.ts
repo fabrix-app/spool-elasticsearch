@@ -1,6 +1,6 @@
 import { Spool } from '@fabrix/fabrix/dist/common'
-import { isObject, isFunction } from 'lodash'
-const elasticsearch = require('elasticsearch')
+import { clone, isObject, isFunction } from 'lodash'
+import * as elasticsearch from 'elasticsearch'
 
 import * as config from './config/index'
 import * as pkg from '../package.json'
@@ -10,6 +10,7 @@ import * as api from './api/index'
  * ElasticSearch integration for Fabrix
  */
 export class ElasticsearchSpool extends Spool {
+  public client
 
   constructor(app) {
     super(app, {
@@ -17,16 +18,31 @@ export class ElasticsearchSpool extends Spool {
       api: api,
       pkg: pkg
     })
+
+    this.extensions = {
+      elasticClient: {
+        get: () => {
+          return this.client
+        },
+        set: (newElasticSearchClient) => {
+          throw new Error('elasticClient can not be set through FabrixApp, check spool-elasticsearch instead')
+        },
+        enumerable: true,
+        configurable: true
+      }
+    }
   }
   /**
    * Ensure that this spool supports the configured migration
    */
-  validate() {
-    if (!isObject(this.app.config.get('elasticsearch')))
+  async validate() {
+    if (!isObject(this.app.config.get('elasticsearch'))) {
       return Promise.reject(new Error('No configuration found at config.elasticsearch !'))
+    }
 
-    if (!isObject(this.app.config.get('elasticsearch.connection')))
+    if (!isObject(this.app.config.get('elasticsearch.connection'))) {
       return Promise.reject(new Error('No connection configuration defined !'))
+    }
   }
 
   configure() {
@@ -36,26 +52,26 @@ export class ElasticsearchSpool extends Spool {
     }
   }
 
-  initialize() {
-    super.initialize()
+  async initialize() {
+    // super.initialize()
 
     // Notice !!!
     // Elastic try to change given config onject. So do not remove `clone`
     // Otherwise Fabrix will pass readonly object and Elasticsearch wouldn't
     // be able to connect
     this.client = new elasticsearch.Client(clone(this.app.config.get('elasticsearch.connection')))
-    this.app.elasticClient = this.client
 
     // If no need to validate connection - exit
-    if (!this.app.config.get('elasticsearch.validateConnection'))
+    if (!this.app.config.get('elasticsearch.validateConnection')) {
       return Promise.resolve()
+    }
 
     // validating connection using ping command
     return new Promise((resolve, reject) => {
       this.client.ping((err) => {
-        if (err)
+        if (err) {
           return reject(err)
-
+        }
         resolve()
       })
     })
@@ -65,11 +81,12 @@ export class ElasticsearchSpool extends Spool {
    * Close connection to Elasticsearch
    */
   unload() {
-    if (!this.app.elasticClient || !isFunction(this.app.elasticClient.close))
+    if (!this.app.elasticClient || !isFunction(this.app.elasticClient.close)) {
       return
+    }
 
     // Closing elasticsearch connection
-    this.app.elasticClient.close()
+    return this.app.elasticClient.close()
   }
 
 }
