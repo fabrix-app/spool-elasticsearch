@@ -1,0 +1,1 @@
+export { ElasticsearchService } from './ElasticsearchService'

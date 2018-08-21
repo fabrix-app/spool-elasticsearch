@@ -1,0 +1,1 @@
+export { ElasticsearchSpool } from './ElasticsearchSpool'
