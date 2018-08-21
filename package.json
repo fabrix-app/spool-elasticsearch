@@ -50,7 +50,7 @@
   "homepage": "https://github.com/fabrix-app/spool-elasticsearch#readme",
   "dependencies": {
     "elasticsearch": "^15.1.1",
-    "lodash": "^4.13.1"
+    "lodash": "^4.17.10"
   },
   "devDependencies": {
     "@fabrix/fabrix": "^1.1.4",
