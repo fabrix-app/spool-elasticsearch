@@ -1,5 +1,6 @@
 import { Spool } from '@fabrix/fabrix/dist/common'
 import { clone, isObject, isFunction } from 'lodash'
+import { Validator } from './validator'
 import * as elasticsearch from 'elasticsearch'
 
 import * as config from './config/index'
@@ -37,12 +38,26 @@ export class ElasticsearchSpool extends Spool {
    */
   async validate() {
     if (!isObject(this.app.config.get('elasticsearch'))) {
-      return Promise.reject(new Error('No configuration found at config.elasticsearch !'))
+      return Promise.reject(new Error('No configuration found at config.elasticsearch!'))
     }
 
     if (!isObject(this.app.config.get('elasticsearch.connection'))) {
-      return Promise.reject(new Error('No connection configuration defined !'))
+      return Promise.reject(new Error('No connection configuration defined!'))
     }
+
+    const stores = this.app.config.get('stores')
+    if (stores && Object.keys(stores).length === 0) {
+      this.app.log.warn('No store configured at config.stores, models will be ignored')
+    }
+    const models = this.app.config.get('models')
+    if (models && Object.keys(models).length === 0) {
+      this.app.log.warn('No models configured at config.models, models will be ignored')
+    }
+    return Promise.all([
+      Validator.validateStoresConfig(stores),
+      Validator.validateModelsConfig(models),
+      Validator.validateElasticConfig(this.app.config.get('elasticsearch'))
+    ])
   }
 
   configure() {
@@ -56,14 +71,15 @@ export class ElasticsearchSpool extends Spool {
     // super.initialize()
 
     // Notice !!!
-    // Elastic try to change given config onject. So do not remove `clone`
+    // Elastic tries to change given config onject. So do not remove `clone`
     // Otherwise Fabrix will pass readonly object and Elasticsearch wouldn't
     // be able to connect
     this.client = new elasticsearch.Client(clone(this.app.config.get('elasticsearch.connection')))
 
     // If no need to validate connection - exit
     if (!this.app.config.get('elasticsearch.validateConnection')) {
-      return Promise.resolve()
+      // Migrate the connections and/or models by their migration strategy
+      return this.migrate()
     }
 
     // validating connection using ping command
@@ -72,7 +88,14 @@ export class ElasticsearchSpool extends Spool {
         if (err) {
           return reject(err)
         }
-        resolve()
+        // Migrate the connections and/or models by their migration strategy
+        return this.migrate()
+          .then(() => {
+            resolve()
+          })
+          .catch(_err => {
+            reject(_err)
+          })
       })
     })
   }
@@ -87,6 +110,14 @@ export class ElasticsearchSpool extends Spool {
 
     // Closing elasticsearch connection
     return this.app.elasticClient.close()
+  }
+
+  /**
+   * Migrate the database connections
+   */
+  async migrate() {
+    const SchemaMigrationService = this.app.services.ElasticsearchSchemaMigrationService
+    return SchemaMigrationService.migrateDB([this.app.elasticClient])
   }
 
 }

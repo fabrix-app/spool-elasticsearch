@@ -77,7 +77,7 @@ export class SomeController extends Controller {
 }
 ```
 
-More information about Elasticsearch client could be found here: https://github.com/elastic/elasticsearch-js
+More information about Elasticsearch client could be found here: [Elasticsearch-js](https://github.com/elastic/elasticsearch-js)
 
 ## License
 [MIT](https://github.com/fabrix-app/spool-elasticsearch/blob/master/LICENSE)
