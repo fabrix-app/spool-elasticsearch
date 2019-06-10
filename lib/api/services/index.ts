@@ -1,1 +1,1 @@
-export { ElasticsearchService } from './ElasticsearchService'
+export { ElasticsearchSchemaMigrationService } from './ElasticsearchSchemaMigrationService'
