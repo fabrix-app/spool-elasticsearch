@@ -1,5 +1,6 @@
 import { Spool } from '@fabrix/fabrix/dist/common'
 import { clone, isObject, isFunction } from 'lodash'
+import { Validator } from './validator'
 import * as elasticsearch from 'elasticsearch'
 
 import * as config from './config/index'
@@ -37,12 +38,16 @@ export class ElasticsearchSpool extends Spool {
    */
   async validate() {
     if (!isObject(this.app.config.get('elasticsearch'))) {
-      return Promise.reject(new Error('No configuration found at config.elasticsearch !'))
+      return Promise.reject(new Error('No configuration found at config.elasticsearch!'))
     }
 
     if (!isObject(this.app.config.get('elasticsearch.connection'))) {
-      return Promise.reject(new Error('No connection configuration defined !'))
+      return Promise.reject(new Error('No connection configuration defined!'))
     }
+
+    return Promise.all([
+      Validator.validateElasticConfig(this.app.config.get('elasticsearch'))
+    ])
   }
 
   configure() {
@@ -56,7 +61,7 @@ export class ElasticsearchSpool extends Spool {
     // super.initialize()
 
     // Notice !!!
-    // Elastic try to change given config onject. So do not remove `clone`
+    // Elastic tries to change given config onject. So do not remove `clone`
     // Otherwise Fabrix will pass readonly object and Elasticsearch wouldn't
     // be able to connect
     this.client = new elasticsearch.Client(clone(this.app.config.get('elasticsearch.connection')))

@@ -6,7 +6,7 @@ const smokesignals = require('smokesignals')
 exports.noValidate = _.defaultsDeep({
   pkg: {
     name: 'spool-elasticsearch-test',
-    version: '1.0.0'
+    version: '1.6.0'
   },
   config: {
     log: {
@@ -31,7 +31,7 @@ exports.noValidate = _.defaultsDeep({
 exports.validate = _.defaultsDeep({
   pkg: {
     name: 'spool-elasticsearch-test',
-    version: '1.0.0'
+    version: '1.6.0'
   },
   config: {
     log: {
