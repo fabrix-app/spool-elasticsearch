@@ -60,7 +60,7 @@
     "@fabrix/spool-router": "^1.6.2",
     "@types/node": "~10.3.4",
     "express": "^4.15.2",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "nyc": "^13.3.0",
     "pg": "^6.4.2",
     "smokesignals": "^3.0.4",
